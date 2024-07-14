@@ -1,80 +1,94 @@
+CREATE TABLE Person(
+   uuid INT AUTO_INCREMENT,
+   nom VARCHAR(50) NOT NULL,
+   prenom VARCHAR(50) NOT NULL,
+   date_naissance DATE NOT NULL,
+   adresse VARCHAR(100) NOT NULL,
+   PRIMARY KEY(uuid)
+);
+
 CREATE TABLE Apprenant(
-   Id_Apprenant COUNTER,
-   UUID VARCHAR(50),
-   Nom VARCHAR(50),
-   Adresse VARCHAR(50) NOT NULL,
-   Prenom VARCHAR(50),
-   PRIMARY KEY(Id_Apprenant, UUID)
-);
-
-CREATE TABLE Module_(
-   Id_Module COUNTER,
-   Version VARCHAR(50) NOT NULL,
-   Objectif VARCHAR(50) NOT NULL,
-   Titre VARCHAR(50) NOT NULL,
-   Duree INT NOT NULL,
-   Tags VARCHAR(50) NOT NULL,
-   PRIMARY KEY(Id_Module)
-);
-
-CREATE TABLE Formation(
-   Id_Formation COUNTER,
-   Titre VARCHAR(50),
-   PRIMARY KEY(Id_Formation)
-);
-
-CREATE TABLE Contenu(
-   Id_Contenu COUNTER,
-   Texte VARCHAR(50),
-   Image VARCHAR(50),
-   Video VARCHAR(50),
-   PRIMARY KEY(Id_Contenu),
-   UNIQUE(Texte),
-   UNIQUE(Image),
-   UNIQUE(Video)
+   id_apprenant INT AUTO_INCREMENT,
+   uuid INT NOT NULL,
+   PRIMARY KEY(id_apprenant),
+   UNIQUE(uuid),
+   FOREIGN KEY(uuid) REFERENCES Person(uuid)
 );
 
 CREATE TABLE Formateur(
-   UUID VARCHAR(50),
-   Id_Formateur COUNTER,
-   Code VARCHAR(50),
-   Nom VARCHAR(50) NOT NULL,
-   Prenom VARCHAR(50) NOT NULL,
-   PRIMARY KEY(UUID, Id_Formateur, Code)
+   id_formateur INT AUTO_INCREMENT,
+   code VARCHAR(50) NOT NULL,
+   uuid INT NOT NULL,
+   PRIMARY KEY(id_formateur),
+   UNIQUE(uuid),
+   UNIQUE(code),
+   FOREIGN KEY(uuid) REFERENCES Person(uuid)
 );
 
-CREATE TABLE Valider(
-   Id_Apprenant INT,
-   UUID VARCHAR(50),
-   Id_Module INT,
-   Validation LOGICAL NOT NULL,
-   PRIMARY KEY(Id_Apprenant, UUID, Id_Module),
-   FOREIGN KEY(Id_Apprenant, UUID) REFERENCES Apprenant(Id_Apprenant, UUID),
-   FOREIGN KEY(Id_Module) REFERENCES Module_(Id_Module)
+CREATE TABLE Module_(
+   id_module INT AUTO_INCREMENT,
+   intitule VARCHAR(100) NOT NULL,
+   objectif_pedagogique VARCHAR(255) NOT NULL,
+   version VARCHAR(20),
+   date_creation DATETIME NOT NULL,
+   duree TIME NOT NULL,
+   tags VARCHAR(255) NOT NULL,
+   PRIMARY KEY(id_module)
 );
 
-CREATE TABLE Contenir(
-   Id_Module INT,
-   Id_Formation INT,
-   PRIMARY KEY(Id_Module, Id_Formation),
-   FOREIGN KEY(Id_Module) REFERENCES Module_(Id_Module),
-   FOREIGN KEY(Id_Formation) REFERENCES Formation(Id_Formation)
+CREATE TABLE Formation(
+   id_formation INT AUTO_INCREMENT,
+   titre VARCHAR(100) NOT NULL,
+   PRIMARY KEY(id_formation),
+   UNIQUE(titre)
+);
+
+CREATE TABLE Contenu(
+   id_contenu INT AUTO_INCREMENT,
+   image VARCHAR(255),
+   video VARCHAR(255),
+   texte TEXT,
+   PRIMARY KEY(id_contenu)
+);
+
+CREATE TABLE Suivre(
+   id_apprenant INT,
+   id_formation INT,
+   PRIMARY KEY(id_apprenant, id_formation),
+   FOREIGN KEY(id_apprenant) REFERENCES Apprenant(id_apprenant),
+   FOREIGN KEY(id_formation) REFERENCES Formation(id_formation)
 );
 
 CREATE TABLE Composer(
-   Id_Module INT,
-   Id_Contenu INT,
-   PRIMARY KEY(Id_Module, Id_Contenu),
-   FOREIGN KEY(Id_Module) REFERENCES Module_(Id_Module),
-   FOREIGN KEY(Id_Contenu) REFERENCES Contenu(Id_Contenu)
+   id_module INT,
+   id_formation INT,
+   PRIMARY KEY(id_module, id_formation),
+   FOREIGN KEY(id_module) REFERENCES Module_(id_module),
+   FOREIGN KEY(id_formation) REFERENCES Formation(id_formation)
 );
 
-CREATE TABLE Rediger(
-   Id_Module INT,
-   UUID VARCHAR(50),
-   Id_Formateur INT,
-   Code VARCHAR(50),
-   PRIMARY KEY(Id_Module, UUID, Id_Formateur, Code),
-   FOREIGN KEY(Id_Module) REFERENCES Module_(Id_Module),
-   FOREIGN KEY(UUID, Id_Formateur, Code) REFERENCES Formateur(UUID, Id_Formateur, Code)
+CREATE TABLE Valider(
+   id_apprenant INT,
+   id_module INT,
+   evaluation BOOLEAN NOT NULL,
+   PRIMARY KEY(id_apprenant, id_module),
+   FOREIGN KEY(id_apprenant) REFERENCES Apprenant(id_apprenant),
+   FOREIGN KEY(id_module) REFERENCES Module_(id_module)
+);
+
+CREATE TABLE Gerer(
+   id_formateur INT,
+   id_module INT,
+   date_modification DATETIME,
+   PRIMARY KEY(id_formateur, id_module),
+   FOREIGN KEY(id_formateur) REFERENCES Formateur(id_formateur),
+   FOREIGN KEY(id_module) REFERENCES Module_(id_module)
+);
+
+CREATE TABLE Constituer(
+   id_module INT,
+   id_contenu INT,
+   PRIMARY KEY(id_module, id_contenu),
+   FOREIGN KEY(id_module) REFERENCES Module_(id_module),
+   FOREIGN KEY(id_contenu) REFERENCES Contenu(id_contenu)
 );
